@@ -3,6 +3,8 @@ package com.example.usercrud;
 import android.os.Bundle;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import com.android.volley.*;
 import com.android.volley.toolbox.*;
@@ -39,21 +41,34 @@ public class MainActivity extends AppCompatActivity {
                 response -> {
                     try {
                         JSONArray users = new JSONArray(response);
+                        StringBuilder userData = new StringBuilder();
+
                         for (int i = 0; i < users.length(); i++) {
                             JSONObject obj = users.getJSONObject(i);
                             String name = obj.getString("name");
                             String email = obj.getString("email");
-                            // Handle data as needed
+                            userData.append("Name: ").append(name).append("\n");
+                            userData.append("Email: ").append(email).append("\n\n");
                         }
-                        Toast.makeText(this, "Users Loaded", Toast.LENGTH_SHORT).show();
+
+                        // Show in a popup (AlertDialog)
+                        new AlertDialog.Builder(this)
+                                .setTitle("Fetched Users")
+                                .setMessage(userData.toString())
+                                .setPositiveButton("OK", null)
+                                .show();
+
                     } catch (JSONException e) {
                         e.printStackTrace();
+                        Toast.makeText(this, "JSON Error", Toast.LENGTH_SHORT).show();
                     }
                 },
                 error -> Toast.makeText(this, "Error: " + error.getMessage(), Toast.LENGTH_LONG).show()
         );
+
         VolleySingleton.getInstance(this).addToRequestQueue(request);
     }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
